@@ -1,5 +1,5 @@
 #holis esta es mi pequeña parte
-from tkinter import messagebox, Tk, Frame, Button, Label, Entry, Text
+from tkinter import messagebox, Tk, Frame, Button, Label, Entry, Text, Toplevel
 from tkinter import ttk
 from sqlite3 import connect
 import random
@@ -77,3 +77,88 @@ def verPalabras():
 
     ventanaTabla = Toplevel(app)
     ventanaTabla.title("Palabras registradas")
+
+    tabla = ttk.Treeview(ventanaTabla, columns=("ID", "Palabra", "Descripcion"), show="headings")
+    tabla.column("ID", width=20, anchor="center")
+    tabla.heading("ID", text="ID")
+    tabla.heading("Palabra", text="Palabra")
+    tabla.heading("Descripcion", text="Descripción")
+    tabla.grid(row=0, column=0, columnspan=3)
+
+    botonCerrar = Button(ventanaTabla, text="Cerrar", command=cerrarVentana)
+    botonCerrar.grid(row=1, column=0, padx=10, pady=10)
+
+    cr.execute('SELECT * FROM palabras')
+    palabras = cr.fetchall()
+    for palabra in palabras:
+        tabla.insert("", "end", values=palabra)
+
+# Crear la ventana principal
+app = Tk()
+app.title("Adivina la Palabra")
+
+# Configuración de la interfaz gráfica
+# Apartado de Acciones
+acciones_frame = Frame(app)
+acciones_frame.grid(row=0, column=0, padx=10, pady=10)
+nueva_palabra_btn = Button(acciones_frame, text="Nueva Palabra", command=nuevaPalabra)
+nueva_palabra_btn.grid(row=0, column=0, padx=5, pady=5)
+
+# Apartado de Información
+informacion_frame = Frame(app)
+informacion_frame.grid(row=0, column=1, padx=10, pady=10)
+info_label = Label(informacion_frame, text="Descripción: ")
+info_label.grid(row=0, column=0, sticky="wens", columnspan=2)
+
+longitud_label = Label(informacion_frame, text="Longitud: ")
+longitud_label.grid(row=1, column=0, sticky="wens", columnspan=2)
+
+intentos_label = Label(informacion_frame, text="Intentos restantes: ")
+intentos_label.grid(row=2, column=0, sticky="wens", columnspan=2)
+
+# Apartado de Jugar
+jugar_frame = Frame(app)
+jugar_frame.grid(row=1, column=0, padx=10, pady=10)
+palabra_entry = Entry(jugar_frame)
+palabra_entry.grid(row=0, column=0, padx=5, pady=5)
+comprobar_btn = Button(jugar_frame, text="Comprobar", command=verificarPalabra)
+comprobar_btn.grid(row=1, column=0, padx=5, pady=5)
+
+# Apartado de Agregar palabra
+etiqueta1 = Label(app, text="Agregue una palabra nueva", font=(25))
+etiqueta1.grid(row=2, column=0, sticky="wens", columnspan=4)
+
+etiqueta2 = Label(app, text='Ingrese la palabra: ', fg='blue', font=(20))
+etiqueta2.grid(row=3, column=0, sticky='wens', columnspan=2)
+nombrePalabra = Entry(app)
+nombrePalabra.grid(row=3, column=2, sticky='wens', columnspan=4)
+
+etiqueta3 = Label(app, text='Ingrese la descripcion: ', fg='blue', font=(20))
+etiqueta3.grid(row=4, column=0, sticky='wens', columnspan=2)
+descripcion = Text(app, height=5, width=30)
+descripcion.grid(row=4, column=2, sticky='wens', columnspan=3, pady=5, padx=3)
+
+# Etiquetas de resultado
+resultado = Label(app, text="La palabra es: ")
+resultad2 = Label(app, text="La descripcion es: ")
+resultado.grid(row=5, column=0, columnspan=3)
+resultad2.grid(row=6, column=0, columnspan=3)
+
+# Botones de acciones
+resul = Button(app, text="Agregar", command=agregarPalabra)
+resul.grid(row=7, column=0)
+
+ver = Button(app, text="Ver Palabras", command=verPalabras)
+ver.grid(row=7, column=1)
+
+cerrarP = Button(app, text='Cerrar', command=app.quit)
+cerrarP.grid(row=7, column=2)
+
+# Iniciar el juego con una nueva palabra
+nuevaPalabra()
+
+# Ejecutar la aplicación
+app.mainloop()
+
+# Cerrar la base de datos cuando termine el programa
+baseDeDatos.close()
