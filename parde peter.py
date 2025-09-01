@@ -18,7 +18,7 @@ def crearTabla():
             palabra TEXT NOT NULL,
             descripcion TEXT NOT NULL);''')
     baseDeDatos.commit()
-    print("Tabla creada con exito ")
+    print("Tabla creada con éxito ")
 
 #FUNCION PARA AGREGAR UNA NUEVA PALABRA
 def agregarPalabra(nuevaPalabra, nuevaDescripcion):
