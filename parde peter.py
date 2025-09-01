@@ -10,6 +10,23 @@ from sqlite3 import *
 baseDeDatos = connect("palabra.db")
 cr = baseDeDatos.cursor()
 
+#FUNCION PARA AGREGAR UNA PALABRA INICIAL
+def agregarPalabraInicial():
+    palabra_inicial = "manzana"
+    descripcion_inicial = "Es una fruta roja o verde (eva)"
+
+    #VERIFICA SI LA PALABRA YA EXISTE EN LA BASE DE DATOS
+    cr.execute('SELECT * FROM palabras WHERE palabra = ?', (palabra_inicial,))
+    if cr.fetchone() is None: #SOLO AGREGA SI LA PALABRA NO EXISTE
+        cr.execute('INSERT INTO palabras (palabra, descripcion) VALUES (?, ?)', (palabra_inicial, descripcion_inicial))
+        baseDeDatos.commit()
+        print("Plabara inicial 'manzana' agregada")
+    else:
+        print("La palabra 'manzana' ya existe en la base de datos")
+
+#LLAMAR ALA FUNCION PARA ASEGURARNOA DE QUE LA PALABRA 'manzana' ESTA EN LA BASE DE DATOS
+agregarPalabraInicial()
+
 #CREAR TABLA
 def crearTabla():
     cr.execute('''
