@@ -24,17 +24,17 @@ def abrir_agregar_p():
     titulo2=CTkLabel(ven2, text="Agregar palabra",font=("Arial",20))
     titulo2.grid(column=0, row=0, padx=3, pady=3, columnspan=5)
 
-    palabra_label = CTkLabel(ven2, text="Palabra:", font=("Arial", 14))
-    palabra_label.grid(column=0,row=2, padx=3, pady=3,columnspan= 5,sticky="WE")
+    palabra = CTkLabel(ven2, text="Palabra:", font=("Arial", 14))
+    palabra.grid(column=0,row=2, padx=3, pady=3,columnspan= 5,sticky="WE")
 
-    entrada_palabra =CTkEntry(ven2, fg_color="white")
-    entrada_palabra.grid(column=0,row=3, padx=3, pady=3,columnspan= 5,sticky="WE")
+    palabrae =CTkEntry(ven2, fg_color="white")
+    palabrae.grid(column=0,row=3, padx=3, pady=3,columnspan= 5,sticky="WE")
 
-    descripcion_label =CTkLabel(ven2, text="Descripción:", font=("Arial", 14))
-    descripcion_label.grid(column=0,row=4, padx=3, pady=3,columnspan= 5,sticky="WE")
+    descripcion =CTkLabel(ven2, text="Descripción:", font=("Arial", 14))
+    descripcion.grid(column=0,row=4, padx=3, pady=3,columnspan= 5,sticky="WE")
 
-    entrada_descripcion =CTkEntry(ven2, fg_color="white")
-    entrada_descripcion.grid(column=0,row=5, padx=3, pady=3,columnspan= 5,sticky="WE")
+    descripcione =CTkEntry(ven2, fg_color="white")
+    descripcione.grid(column=0,row=5, padx=3, pady=3,columnspan= 5,sticky="WE")
 
     aceptar=CTkButton(ven2, text="Aceptar")
     aceptar.grid(column=0,row=6, padx=3, pady=3)
