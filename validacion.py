@@ -1,37 +1,34 @@
-# game_logic.py
+from parde_peter import seleccionarPalabra, agregarPalabra
 
-from database import seleccionarPalabra, agregarPalabra, verPalabras
-
-# Variables globales del juego
 intentos_restantes = 5
 palabra_actual = ""
 descripcion_actual = ""
 
-# Iniciar nueva palabra
-def nueva_palabra():
+def nuevaPalabra():
     global palabra_actual, descripcion_actual, intentos_restantes
-    palabra = seleccionarPalabra()
-    palabra_actual = palabra[1]
-    descripcion_actual = palabra[2]
-    intentos_restantes = 5
-    return descripcion_actual, len(palabra_actual), intentos_restantes
+    p = seleccionarPalabra()
+    if p:
+        palabra_actual = p[1]
+        descripcion_actual = p[2]
+        intentos_restantes = 5
+        return palabra_actual, descripcion_actual, intentos_restantes
+    else:
+        return None, None, 0
 
-# Verificar intento del jugador
-def verificar_palabra(palabra_usuario):
-    global intentos_restantes
-
-    if palabra_usuario.lower() == palabra_actual.lower():
-        return "correcto", palabra_actual
+def verificarPalabra(usuario):
+    global intentos_restantes, palabra_actual
+    if usuario.lower() == palabra_actual.lower():
+        return True, "¡Felicidades! Adivinaste la palabra."
     else:
         intentos_restantes -= 1
         if intentos_restantes == 0:
-            return "fallaste", palabra_actual
+            mensaje = f"Perdiste. La palabra era: {palabra_actual}"
+            return False, mensaje
         else:
-            return "intenta", intentos_restantes
+            return False, f"Palabra incorrecta. Intentos restantes: {intentos_restantes}"
 
-# Agregar nueva palabra a la DB
-def agregar_palabra_db(palabra, descripcion):
-    if palabra.strip() == "" or descripcion.strip() == "":
-        return False
-    agregarPalabra(palabra, descripcion)
-    return True
+def agregarPalabraLogica(palabra, descripcion):
+    if not palabra.strip() or not descripcion.strip():
+        return False, "Por favor complete todos los campos."
+    agregarPalabra(palabra.strip(), descripcion.strip())
+    return True, "Palabra agregada con éxito."

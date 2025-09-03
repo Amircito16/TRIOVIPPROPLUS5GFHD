@@ -1,74 +1,104 @@
-# main.py
-
 from customtkinter import *
-from game_logic import nueva_palabra, verificar_palabra, agregar_palabra_db
+from tkinter import messagebox
+from validacion import nuevaPalabra, verificarPalabra, agregarPalabraLogica
+from parde_peter import crearTabla, agregarPalabraInicial, cerrarBaseDeDatos
+
+crearTabla()
+agregarPalabraInicial()
 
 app = CTk()
 app.title("Adivina la palabra")
-app.geometry("500x400")
-app.resizable(width=False, height=False)
 
-# ELEMENTOS GLOBALES
-caja_palabra = CTkEntry(app, width=150, height=40, font=("Arial", 20), justify="center", fg_color="lightblue")
-caja_resultado = CTkLabel(app, text="", font=("Arial", 14), text_color="white")
-descripcion_label = CTkLabel(app, text="", font=("Arial", 16), text_color="white")
+titulo = CTkLabel(app, text="Adivina la palabra", font=("ArialBlack", 20), text_color="white")
+titulo.grid(column=0, row=0, padx=3, pady=3, columnspan=5)
 
-# FUNCIONES DE BOTONES
-def generar_nueva():
-    descripcion, longitud, intentos = nueva_palabra()
-    descripcion_label.configure(text=f"Descripción: {descripcion}  |  Longitud: {longitud}")
-    caja_resultado.configure(text=f"Intentos restantes: {intentos}")
-    caja_palabra.delete(0, END)
+caja_palabra = CTkEntry(app, width=150, height=40, font=("Arial", 20), justify="right", fg_color="lightblue")
+caja_palabra.grid(column=0, row=2, columnspan=5, padx=5, pady=10, sticky="WE")
+
+caja_descripcion = CTkEntry(app, width=150, height=40, font=("Arial", 20), justify="right", fg_color="lightblue", state="readonly")
+caja_descripcion.grid(column=0, row=3, columnspan=5, padx=5, pady=10, sticky="WE")
+
+label_intentos = CTkLabel(app, text="Intentos restantes: 5", font=("Arial", 14), text_color="white")
+label_intentos.grid(column=0, row=4, columnspan=5)
+
+def generar_palabra():
+    global palabra_actual, descripcion_actual, intentos_restantes
+    p, d, i = nuevaPalabra()
+    if p:
+        palabra_actual = p
+        descripcion_actual = d
+        intentos_restantes = i
+        caja_palabra.delete(0, END)
+        caja_descripcion.configure(state="normal")
+        caja_descripcion.delete(0, END)
+        caja_descripcion.insert(0, descripcion_actual)
+        caja_descripcion.configure(state="readonly")
+        label_intentos.configure(text=f"Intentos restantes: {intentos_restantes}")
+    else:
+        messagebox.showwarning("Error", "No hay palabras en la base de datos.")
 
 def verificar():
-    palabra_usuario = caja_palabra.get()
-    resultado, info = verificar_palabra(palabra_usuario)
-
-    if resultado == "correcto":
-        caja_resultado.configure(text=f"✅ ¡Correcto! Era '{info}'. Generando nueva...")
-        generar_nueva()
-    elif resultado == "fallaste":
-        caja_resultado.configure(text=f"❌ Te quedaste sin intentos. La palabra era '{info}'")
-        generar_nueva()
+    global intentos_restantes
+    texto = caja_palabra.get()
+    correcto, mensaje = verificarPalabra(texto)
+    if correcto:
+        messagebox.showinfo("¡Ganaste!", mensaje)
+        generar_palabra()
     else:
-        caja_resultado.configure(text=f"❗ Incorrecto. Intentos restantes: {info}")
+        if intentos_restantes == 0:
+            messagebox.showinfo("Perdiste", mensaje)
+            generar_palabra()
+        else:
+            label_intentos.configure(text=f"Intentos restantes: {intentos_restantes}")
+            messagebox.showwarning("Error", mensaje)
 
-def abrir_agregar_p():
-    ventana = CTkToplevel(app)
-    ventana.geometry("300x250")
-    ventana.title("Agregar palabra")
+def abrir_agregar_palabra():
+    ven2 = CTkToplevel(app)
+    ven2.geometry("300x250")
+    ven2.title("Agregar palabra")
 
-    CTkLabel(ventana, text="Palabra:", font=("Arial", 14)).pack(pady=5)
-    entrada_palabra = CTkEntry(ventana, fg_color="lightblue")
-    entrada_palabra.pack(pady=5)
+    titulo2 = CTkLabel(ven2, text="Agregar palabra", font=("ArialBlack", 20), text_color="white")
+    titulo2.grid(column=0, row=0, padx=3, pady=3, columnspan=5)
 
-    CTkLabel(ventana, text="Descripción:", font=("Arial", 14)).pack(pady=5)
-    entrada_descripcion = CTkEntry(ventana, fg_color="lightblue")
-    entrada_descripcion.pack(pady=5)
+    etiqueta_palabra = CTkLabel(ven2, text="Palabra:", font=("Arial", 14))
+    etiqueta_palabra.grid(column=0, row=1, padx=3, pady=3, columnspan=5, sticky="WE")
+
+    entrada_palabra = CTkEntry(ven2, fg_color="lightblue", text_color="black")
+    entrada_palabra.grid(column=0, row=2, padx=3, pady=3, columnspan=5, sticky="WE")
+
+    etiqueta_descripcion = CTkLabel(ven2, text="Descripción:", font=("Arial", 14))
+    etiqueta_descripcion.grid(column=0, row=3, padx=3, pady=3, columnspan=5, sticky="WE")
+
+    entrada_descripcion = CTkEntry(ven2, fg_color="lightblue", text_color="black")
+    entrada_descripcion.grid(column=0, row=4, padx=3, pady=3, columnspan=5, sticky="WE")
 
     def aceptar():
         palabra = entrada_palabra.get()
         descripcion = entrada_descripcion.get()
-        if agregar_palabra_db(palabra, descripcion):
-            ventana.destroy()
+        ok, msj = agregarPalabraLogica(palabra, descripcion)
+        if ok:
+            messagebox.showinfo("Éxito", msj)
+            ven2.destroy()
         else:
-            CTkLabel(ventana, text="⚠️ Completa todos los campos", text_color="red").pack()
+            messagebox.showwarning("Error", msj)
 
-    CTkButton(ventana, text="Aceptar", command=aceptar, fg_color="lightgreen", text_color="black").pack(pady=10)
-    CTkButton(ventana, text="Cancelar", command=ventana.destroy, fg_color="lightgreen", text_color="black").pack()
+    boton_aceptar = CTkButton(ven2, text="Aceptar", command=aceptar, fg_color="lightgreen", text_color="black")
+    boton_aceptar.grid(column=0, row=5, padx=3, pady=3)
 
-# UI PRINCIPAL
-titulo = CTkLabel(app, text="Adivina la palabra", font=("ArialBlack", 24), text_color="white")
-titulo.grid(column=0, row=0, padx=10, pady=10, columnspan=5)
+    boton_cancelar = CTkButton(ven2, text="Cancelar", command=ven2.destroy, fg_color="lightgreen", text_color="black")
+    boton_cancelar.grid(column=1, row=5, padx=3, pady=3)
 
-descripcion_label.grid(column=0, row=1, columnspan=5, padx=10, pady=5)
-caja_palabra.grid(column=0, row=2, columnspan=5, padx=10, pady=5)
-caja_resultado.grid(column=0, row=3, columnspan=5, padx=10, pady=5)
+boton_generar = CTkButton(app, text="Generar palabra", command=generar_palabra, fg_color="lightgreen", text_color="black")
+boton_generar.grid(column=1, row=1, padx=3, pady=3)
 
-CTkButton(app, text="Generar palabra", command=generar_nueva, fg_color="lightgreen", text_color="black").grid(column=0, row=4, padx=5, pady=5)
-CTkButton(app, text="Verificar", command=verificar, fg_color="lightgreen", text_color="black").grid(column=1, row=4, padx=5, pady=5)
-CTkButton(app, text="Agregar palabra", command=abrir_agregar_p, fg_color="lightgreen", text_color="black").grid(column=2, row=4, padx=5, pady=5)
+boton_agregar = CTkButton(app, text="Agregar palabra", command=abrir_agregar_palabra, fg_color="lightgreen", text_color="black")
+boton_agregar.grid(column=0, row=1, padx=3, pady=3)
 
-# Iniciar con una palabra
-generar_nueva()
+boton_verificar = CTkButton(app, text="Verificar", command=verificar, fg_color="lightgreen", text_color="black")
+boton_verificar.grid(column=0, row=5, columnspan=5, padx=3, pady=3)
+
+app.resizable(width=False, height=False)
+generar_palabra()
 app.mainloop()
+
+cerrarBaseDeDatos()
