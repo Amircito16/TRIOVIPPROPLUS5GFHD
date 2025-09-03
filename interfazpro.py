@@ -6,7 +6,7 @@ from parde_peter import crearTabla, agregarPalabraInicial, cerrarBaseDeDatos
 crearTabla()
 agregarPalabraInicial()
 
-app = CTk()
+app = CTk(fg_color="Black")
 app.title("Adivina la palabra")
 
 titulo = CTkLabel(app, text="Adivina la palabra", font=("ArialBlack", 20), text_color="white")
@@ -53,20 +53,20 @@ def verificar():
             messagebox.showwarning("Error", mensaje)
 
 def abrir_agregar_palabra():
-    ven2 = CTkToplevel(app)
+    ven2 = CTkToplevel(app, fg_color="Black")
     ven2.geometry("300x250")
     ven2.title("Agregar palabra")
 
     titulo2 = CTkLabel(ven2, text="Agregar palabra", font=("ArialBlack", 20), text_color="white")
     titulo2.grid(column=0, row=0, padx=3, pady=3, columnspan=5)
 
-    etiqueta_palabra = CTkLabel(ven2, text="Palabra:", font=("Arial", 14))
+    etiqueta_palabra = CTkLabel(ven2, text="Palabra:", font=("Arial", 14), text_color="white")
     etiqueta_palabra.grid(column=0, row=1, padx=3, pady=3, columnspan=5, sticky="WE")
 
     entrada_palabra = CTkEntry(ven2, fg_color="lightblue", text_color="black")
     entrada_palabra.grid(column=0, row=2, padx=3, pady=3, columnspan=5, sticky="WE")
 
-    etiqueta_descripcion = CTkLabel(ven2, text="Descripción:", font=("Arial", 14))
+    etiqueta_descripcion = CTkLabel(ven2, text="Descripción:", font=("Arial", 14), text_color="white")
     etiqueta_descripcion.grid(column=0, row=3, padx=3, pady=3, columnspan=5, sticky="WE")
 
     entrada_descripcion = CTkEntry(ven2, fg_color="lightblue", text_color="black")
