@@ -1,61 +1,39 @@
-#PEDRO LOPEZ; Esta es mi parte bros!!!
-#YOHANA PEREZ
-#ASAHEL LOPEZ
-#5TO. ELECTRONICA
-#PROYECTO: "ADIVINA LA PALABRA"
+# database.py
+from sqlite3 import connect
 
-from sqlite3 import *
-
-#CONEXION CON LA BASE DE DATOS
-baseDeDatos = connect("palabra.db")
+# Conexión a la base de datos
+baseDeDatos = connect("palabras.db")
 cr = baseDeDatos.cursor()
 
-#FUNCION PARA AGREGAR UNA PALABRA INICIAL
-def agregarPalabraInicial():
-    palabra_inicial = "manzana"
-    descripcion_inicial = "Es una fruta roja o verde (eva)"
-
-    #VERIFICA SI LA PALABRA YA EXISTE EN LA BASE DE DATOS
-    cr.execute('SELECT * FROM palabras WHERE palabra = ?', (palabra_inicial,))
-    if cr.fetchone() is None: #SOLO AGREGA SI LA PALABRA NO EXISTE
-        cr.execute('INSERT INTO palabras (palabra, descripcion) VALUES (?, ?)', (palabra_inicial, descripcion_inicial))
-        baseDeDatos.commit()
-        print("Plabara inicial 'manzana' agregada")
-    else:
-        print("La palabra 'manzana' ya existe en la base de datos")
-
-#LLAMAR ALA FUNCION PARA ASEGURARNOA DE QUE LA PALABRA 'manzana' ESTA EN LA BASE DE DATOS
-agregarPalabraInicial()
-
-#CREAR TABLA
+# Crear la tabla si no existe
 def crearTabla():
     cr.execute('''
-        CREATE TABLE IF NOT EXISTS adivina(
+        CREATE TABLE IF NOT EXISTS palabras (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             palabra TEXT NOT NULL,
-            descripcion TEXT NOT NULL);''')
+            descripcion TEXT NOT NULL
+        );
+    ''')
     baseDeDatos.commit()
-    print("Tabla creada con éxito ")
 
-#FUNCION PARA AGREGAR UNA NUEVA PALABRA
-def agregarPalabra(nuevaPalabra, nuevaDescripcion):
+# Agregar una nueva palabra
+def agregarPalabra(palabra, descripcion):
     cr.execute('''
         INSERT INTO palabras (palabra, descripcion)
-        VALUES (?, ?)''', (nuevaPalabra, nuevaDescripcion))
+        VALUES (?, ?)
+    ''', (palabra, descripcion))
     baseDeDatos.commit()
 
-#FUNCION PARA VER TODAS LAS PALABRA
+# Obtener todas las palabras
 def verPalabras():
     cr.execute('SELECT * FROM palabras')
     return cr.fetchall()
 
-#FUNCION PARA SELECCIONAR UNA PALABRA ALEATORIA
+# Obtener palabra aleatoria
 def seleccionarPalabra():
     cr.execute('SELECT id, palabra, descripcion FROM palabras ORDER BY RANDOM() LIMIT 1')
     return cr.fetchone()
 
-#FUNCION PARA CERRAR LA BASE DE DATO
+# Cerrar conexión (si se necesita)
 def cerrarBaseDeDatos():
     baseDeDatos.close()
-
-baseDeDatos.commit()
